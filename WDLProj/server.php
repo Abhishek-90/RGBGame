@@ -1,5 +1,9 @@
 <?php
-	session_start();
+	// session_start();
+    if(!isset($_SESSION)) 
+    { 
+        session_start(); 
+    } 
 
 	// variable declaration
 	$username = "";
@@ -46,19 +50,18 @@
 
 		// register user if there are no errors in the form
 		if (count($errors) == 0) {
+			$highestscore = 0;
 			$password = md5($password_1);//encrypt the password before saving in the database
-			$query = "INSERT INTO users (username, email, password)
-					  VALUES('$username', '$email', '$password')";
+			$query = "INSERT INTO users (username, email, password, highest_score)
+					  VALUES('$username', '$email', '$password', '$highestscore')";
 			mysqli_query($db, $query);
 
 			$_SESSION['username'] = $username;
 			$_SESSION['success'] = "You are now logged in";
-			header('location: index.php');
+			header('location: Login.php');
 		}
 
 	}
-
-	// ...
 
 	// LOGIN USER
 	if (isset($_POST['login_user'])) {
@@ -79,12 +82,16 @@
 
 			if (mysqli_num_rows($results) == 1) {
 				$_SESSION['username'] = $username;
+				$hscore = mysqli_query($db,"SELECT highest_score FROM users WHERE username='$username';");
+				$_SESSION['highestscore'] = mysqli_fetch_assoc($hscore);
+				
 				$_SESSION['success'] = "You are now logged in";
-				header('location: index.php');
-			}else {
+				header('location: colorGamenew.php');
+
+			}
+			else {
 				array_push($errors, "Wrong username/password combination. Please try again");
 			}
 		}
 	}
-
 ?>
